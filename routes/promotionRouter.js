@@ -1,7 +1,7 @@
 const express = require('express');
 const promotionRouter = express.Router();
 
-promotionRouterRouter.route('/')
+promotionRouter.route('/')
 .get((req, res, next) => {
 promotion.find()
 .then(promotions => {
