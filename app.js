@@ -19,6 +19,8 @@ const connect = mongoose.connect(url, {});
 
 const session = require('expression-session');
 const FileStore = require('session-file-store')(session);
+const passport = require('passport');
+const authenticate = require('./authenticate')
 
 connect.then(() => console.log('Connected correctly to server'),
   err => console.log(err)
@@ -41,25 +43,26 @@ app.use(session({
   store: new FileStore()
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 //middleware setup
 function auth(req, res, next) {
-  console.log(req.session);
+  console.log(req.user);
 
-  if (!req.session.user) {
+  if (!req.user) {
       const err = new Error('You are not authenticated!');
       err.status = 401;
       return next(err);
   } else {
       if (req.session.user === 'authenticated') {
           return next();
-      } else {
-          const err = new Error('You are not authenticated!');
-          err.status = 401;
-          return next(err);
+        } else {
+          return next();
       }
+    }
   }
-}
 //function call
 app.use(auth)
 
