@@ -1,7 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
@@ -17,10 +17,10 @@ const mongoose = require('mongoose');
 //const url = 'mongodb://localhost:27017/nucampsite';
 //const connect = mongoose.connect(url, {});
 
-const session = require('expression-session');
+const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const passport = require('passport');
-const authenticate = require('./authenticate')
+const authenticate = require('./authenticate'); // Ensure authenticate.js is configured properly
 
 connect.then(() => console.log('Connected correctly to server'),
   err => console.log(err)
@@ -36,6 +36,7 @@ app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876-54321'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Sssion config w. filestore
 app.use(session({
   name: 'session-id', 
   secret: '12345-67890-09876-54321',

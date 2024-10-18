@@ -4,15 +4,14 @@ const Schema = mongoose.Schema;
 const passport = require('passport');//is this suppose to be here or in a different file? 
 
 const userSchema = new Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
+  firstname: {
+    type: String, 
+    default: ''
   }, 
-  password: {
-    type: String,
-    required: true
-  }, 
+  lastname: {
+    type: String, 
+    default: ''
+  },
   admin: {
     type: Boolean,
     default: false
