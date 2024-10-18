@@ -14,8 +14,8 @@ const promotionRouter = require('./routes/promotionRouter');
 const partnerRouter = require('./routes/partnerRouter');
 const mongoose = require('mongoose');
 
-const url = 'mongodb://localhost:27017/nucampsite';
-const connect = mongoose.connect(url, {});
+//const url = 'mongodb://localhost:27017/nucampsite';
+//const connect = mongoose.connect(url, {});
 
 const session = require('expression-session');
 const FileStore = require('session-file-store')(session);
@@ -48,23 +48,9 @@ app.use(passport.session());
 
 
 //middleware setup
-function auth(req, res, next) {
-  console.log(req.user);
+const config = require('./config')
 
-  if (!req.user) {
-      const err = new Error('You are not authenticated!');
-      err.status = 401;
-      return next(err);
-  } else {
-      if (req.session.user === 'authenticated') {
-          return next();
-        } else {
-          return next();
-      }
-    }
-  }
-//function call
-app.use(auth)
+const url = config.mongoUrl;
 
 // Routes
 app.use('/', indexRouter);

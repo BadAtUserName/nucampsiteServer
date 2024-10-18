@@ -3,6 +3,7 @@ const User = require('../models/user');
 const passport = require('passport'); // Added passport to handle authentication
 
 const router = express.Router();
+const authenticate = require('../authenticate');
 
 // GET users listing
 router.get('/', function(req, res, next) {
@@ -34,11 +35,11 @@ router.post('/signup', (req, res) => {
 });
 
 // POST /login route
-router.post('/login', passport.authenticate('local'), (req, res) => {
-  // Authenticate the user using Passport's local strategy middleware
+router.post('/login', passport.authenticate('local', {session: false}), (req, res) => {
+  const token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, status: 'You are successfully logged in!'}); // Respond with success message
+  res.json({success: true, token, status: 'You are successfully logged in'});
 });
 
 /* The commented-out code below is the previous manual authentication implementation.
