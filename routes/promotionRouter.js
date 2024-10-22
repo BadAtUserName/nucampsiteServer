@@ -2,10 +2,13 @@ const express = require('express');
 const promotionRouter = express.Router(); // Create an Express router instance
 const Promotion = require('../models/promotion'); // Import the Promotion model
 const authenticate = require('../authenticate'); // Import authentication middleware
+const cors = require('./cors');
 
 // Route for /promotions endpoint
 promotionRouter.route('/')
-  .get((req, res, next) => { //handle GET requests to fetch all promotions
+// Handle pre-flight requests for CORS
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => { //handle GET requests to fetch all promotions
     Promotion.find() //find all promos in the database
       .then(promotions => {
         res.statusCode = 200; //OK
@@ -14,7 +17,7 @@ promotionRouter.route('/')
       })
       .catch(err => next(err)); //handle errors
   })
-  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //handle POST requests (admin only)
+  .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //handle POST requests (admin only)
     Promotion.create(req.body) //create a new promotion
       .then(promotion => {
         console.log('Promotion Created', promotion); //log the created promotion
@@ -24,7 +27,7 @@ promotionRouter.route('/')
       })
       .catch(err => next(err)); //handle errors
   })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //handle DELETE requests (admin only)
+  .delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //handle DELETE requests (admin only)
     Promotion.deleteMany() //delete all promotions
       .then(response => {
         res.statusCode = 200; //ok
@@ -36,7 +39,9 @@ promotionRouter.route('/')
 
 //route for /promotions/promotionId
 promotionRouter.route('/:promotionId')
-  .get((req, res, next) => { //handle GET requests for a specific promotion by id
+// Handle pre-flight requests for CORS
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => { //handle GET requests for a specific promotion by id
     Promotion.findById(req.params.promotionId) //find promotion by id
       .then(promotion => {
         res.statusCode = 200; //ok
@@ -45,11 +50,11 @@ promotionRouter.route('/:promotionId')
       })
       .catch(err => next(err)); //handle errors
   })
-  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => { //post not allowed for specific promotion
+  .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => { //post not allowed for specific promotion
     res.statusCode = 403; //forbidden status
     res.end(`POST operation not supported on /promotions/${req.params.promotionId}`);
   })
-  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //admin only handle PUT requests to update promotion
+  .put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //admin only handle PUT requests to update promotion
     Promotion.findByIdAndUpdate(req.params.promotionId, { //find promotion by id & update
       $set: req.body //update promotion with request body
     }, { new: true }) //return the updated document
@@ -60,7 +65,7 @@ promotionRouter.route('/:promotionId')
       })
       .catch(err => next(err)); //handle errors
   })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //handle delete requests for a specific promotion (admin only)
+  .delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => { //handle delete requests for a specific promotion (admin only)
     Promotion.findByIdAndDelete(req.params.promotionId) //find promotion by id & delete
       .then(response => {
         res.statusCode = 200; //ok

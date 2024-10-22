@@ -2,11 +2,14 @@ const express = require('express');
 const partnerRouter = express.Router();//creat instance of express router
 const authenticate = require('../authenticate');//import middleware
 const Partner = require('../models/partner')//import partner model
+const cors = require('./cors');
 
 
 //Handle request to partners
 partnerRouter.route('/')
-  .get((req, res, next) => {//handle get requests
+// Handle pre-flight requests for CORS
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors,(req, res, next) => {//handle get requests
     partner.find()//find all partner
       .then(partners => {
         res.statusCode = 200;//OK
@@ -15,7 +18,7 @@ partnerRouter.route('/')
       })
       .catch(err => next(err));//handle errors
   })
-  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {//admin only handle post
+  .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {//admin only handle post
     Partner.create(req.body)//create new partner
       .then(partner => {
         console.log('Partner Created ', partner);//log new partner
@@ -25,11 +28,11 @@ partnerRouter.route('/')
       })
       .catch(err => next(err));//handle errors
   })
-  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {//put not allowed
+  .put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {//put not allowed
     res.statusCode = 403;//cant do it, it's forbidden
     res.end('PUT operation not supported on /partners');
   })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+  .delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Partner.deleteMany()//delete all partners
       .then(response => {
         res.statusCode = 200;//ok status
@@ -41,7 +44,9 @@ partnerRouter.route('/')
 
 //handle requests to /partners/partnerID
 partnerRouter.route('/:partnerId')
-  .get((req, res, next) => {//handle request spec partner
+// Handle pre-flight requests for CORS
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors,(req, res, next) => {//handle request spec partner
     Partner.findById(req.params.partnerId)//find partner by ID
       .then(partner => {
         res.statusCode = 200;//ok
@@ -50,7 +55,7 @@ partnerRouter.route('/:partnerId')
       })
       .catch(err => next(err));//catch errors
   })
-  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {//post not allowed spec partner
+  .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {//post not allowed spec partner
     res.statusCode = 403;//forbidden
     res.end(`POST operation not supported on /partners/${req.params.partnerId}`);
   })
@@ -65,7 +70,7 @@ partnerRouter.route('/:partnerId')
       })
       .catch(err => next(err));//Handle errors
   })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {// Handle DELETE requests for specific partner (admin only)
+  .delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {// Handle DELETE requests for specific partner (admin only)
     Partner.findByIdAndDelete(req.params.partnerId)//find partner by id and delete
       .then(response => {
         res.statusCode = 200;//ok
