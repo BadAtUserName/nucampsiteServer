@@ -1,12 +1,14 @@
 const mongoose = require('mongoose'); // Import Mongoose to interact with MongoDB
 const passportLocalMongoose = require('passport-local-mongoose'); // Import Passport-Local Mongoose plugin
+const { facebook } = require('../config');
 const Schema = mongoose.Schema; // Use Schema from Mongoose to create data structure
 
 // Define the User schema with an admin field
 const userSchema = new Schema({
   admin: {
     type: Boolean, // The 'admin' field is a Boolean to track admin status
-    default: false // By default, users are not admins
+    default: false, // By default, users are not admins
+    facebookId: String
   }
 });
 

@@ -54,6 +54,14 @@ router.post('/login', passport.authenticate('local', {session: false}), (req, re
   res.setHeader('Content-Type', 'application/json');//set response content type
   res.json({success: true, token, status: 'You are successfully logged in'});//return success message and token
 });
+router.get('/facebook/token', passport.authenticate('facebook-token', { session: false}), (req, res) => {
+  if (req.user) {
+    const token = authenticate.getToken({_id: req.user._id});
+    res.statusCode = 200; 
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true, token: token, status: 'Your are successfully logged in!'});
+  }
+})
 
 /* The commented-out code below is the previous manual authentication implementation.
 router.post('/login', (req, res, next) => {
